@@ -1,6 +1,8 @@
 var gulp = require('gulp'),
  sass = require('gulp-sass'); //Подключаем Sass пакет;
   browserSync = require('browser-sync'); // Подключаем Browser Sync
+  cssnano = require('gulp-cssnano'), // Подключаем пакет для минификации CSS
+rename = require('gulp-rename'); // Подключаем библиотеку для переименования файлов
 
   gulp.task('sass', function(){ // Создаем таск "sass"
       return gulp.src('sass/main.sass') // Берем источник
@@ -19,7 +21,14 @@ var gulp = require('gulp'),
      });
  });
 
- gulp.task('watch',['browser-sync', 'sass'], function() {
+ gulp.task('css-libs', ['sass'], function() {
+     return gulp.src('css/main.css') // Выбираем файл для минификации
+         .pipe(cssnano()) // Сжимаем
+         .pipe(rename({suffix: '.min'})) // Добавляем суффикс .min
+         .pipe(gulp.dest('css/')); // Выгружаем в папку app/css
+ });
+
+ gulp.task('watch',['browser-sync','css-libs', 'sass'], function() {
      gulp.watch('sass/*.sass', ['sass']); // Наблюдение за sass файлами
      gulp.watch('*.html', browserSync.reload); // Наблюдение за HTML файлами в корне проекта
      gulp.watch('js/**/*.js', browserSync.reload); // Наблюдение за JS файлами в папке js
